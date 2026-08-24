@@ -1,76 +1,15 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Slot Roguelike — Debug Playground</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Slot Roguelike — Debug Playground</title><link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <main class="page">
-    <header class="topbar">
-      <div>
-        <h1>Slot Roguelike — Debug Playground</h1>
-        <p>Ранний прототип механики. Без арта, аккаунтов и рейтингов.</p>
-      </div>
-      <div class="seed-box">
-        <label>Seed <input id="seedInput" type="number" value="12345"></label>
-        <span class="help-text">Seed фиксирует случайность: одинаковый seed даёт ту же последовательность выпадений.</span>
-        <button id="restartSeedBtn">Restart same seed</button>
-        <button id="newSeedBtn">New seed</button>
-      </div>
-    </header>
-
-    <section class="hud">
-      <div><span class="label">Target</span><strong id="targetText">0 / 120</strong><small>Очки / цель. Набери цель до конца Spin.</small></div>
-      <div><span class="label">Spins</span><strong id="spinsText">8</strong><small>Сколько вращений осталось в этом испытании.</small></div>
-      <div><span class="label">Coins</span><strong id="coinsText">20</strong><small>Валюта забега. Позже тратится в магазине.</small></div>
-      <div><span class="label">Last spin</span><strong id="lastScoreText">0</strong><small>Сколько очков принесло последнее вращение.</small></div>
-    </section>
-
-    <section class="layout">
-      <div class="machine-panel card">
-        <div class="section-intro"><strong>Slot Grid 3×3</strong><span>Сейчас очки дают совпадения из 2–3 одинаковых символов по горизонтали. ★ Wild заменяет недостающий символ.</span></div>
-        <div id="grid" class="grid" aria-label="slot grid"></div>
-        <button id="spinBtn" class="spin-btn">SPIN</button>
-        <div id="resultText" class="result-text">Готов к первому Spin</div>
-      </div>
-
-      <aside class="card">
-        <h2>Current Build</h2>
-        <p class="muted compact">Твой текущий пул символов. ×N — сколько копий символа участвует в случайном выпадении; больше копий обычно означает выше шанс увидеть его.</p>
-        <div id="poolList" class="pool-list"></div>
-        <h3>Modifiers</h3>
-        <p class="muted compact">Постоянные эффекты текущего забега, которые меняют подсчёт очков или поведение символов.</p>
-        <div id="modifierList" class="tag-list"></div>
-      </aside>
-    </section>
-
-    <section class="layout lower">
-      <div class="card">
-        <h2>Developer Controls</h2>
-        <p class="muted">Тестовые кнопки: позволяют вручную добавлять символы и включать модификаторы, чтобы быстро проверять разные билды. Это не часть обычного gameplay.</p>
-        <div id="symbolButtons" class="button-grid"></div>
-        <hr>
-        <div id="modifierButtons" class="button-grid"></div>
-        <hr>
-        <div class="button-grid">
-          <button id="addCoinsBtn">+20 Coins</button>
-          <button id="resetRunBtn">Reset run</button>
-          <button id="forceJackpotBtn">Force test grid</button>
-        </div>
-        <p class="help-text block">Force test grid подставляет заранее заданную комбинацию в следующий Spin — удобно для проверки scoring и эффектов без ожидания нужного RNG.</p>
-      </div>
-
-      <div class="card log-card">
-        <div class="log-title">
-          <div><h2>Event Log</h2><p class="muted compact">Пошагово показывает, почему Spin дал именно столько очков: линии, бонусы, модификаторы и итог.</p></div>
-          <button id="clearLogBtn">Clear</button>
-        </div>
-        <ol id="eventLog" class="event-log"></ol>
-      </div>
-    </section>
-  </main>
-  <script src="app.js"></script>
-</body>
-</html>
+<body><main class="page">
+<header class="topbar"><div><h1>Slot Roguelike — Debug Playground</h1><p>Ранний прототип механики. Здесь важнее понять правила и ощущения, чем красота.</p></div><div class="seed-box"><label>Seed <input id="seedInput" type="number" value="12345"></label><span class="help-text">Одинаковый Seed = та же последовательность случайных выпадений.</span><button id="restartSeedBtn">Restart same seed</button><button id="newSeedBtn">New seed</button></div></header>
+<section class="hud"><div><span class="label">Encounter Score</span><strong id="targetText">0 / 120</strong><small>Слева набранные очки, справа цель. Достигни 120 до окончания Spin.</small><div class="progress"><i id="scoreProgress"></i></div></div><div><span class="label">Spins Left</span><strong id="spinsText">8</strong><small>Каждый SPIN тратит 1. Если станет 0 раньше цели — поражение.</small></div><div><span class="label">Coins</span><strong id="coinsText">20</strong><small>Валюта забега. За победу: 6 + 2 за каждый оставшийся Spin.</small></div><div><span class="label">Last Spin Score</span><strong id="lastScoreText">+0</strong><small>Очки только за последнее вращение. Они прибавляются к Encounter Score.</small></div></section>
+<section class="rules card"><div><h2>Как начисляются очки</h2><p>Считаются только <strong>горизонтальные ряды</strong>. Два одинаковых символа в одном ряду дают сумму их стоимости. Три одинаковых дают сумму ×2. ★ Wild заменяет недостающий символ, но сам стоит 0.</p></div><div class="rule-examples"><div><b>🍒 🍒 🍋</b><span>5 + 5 = <strong>+10</strong></span></div><div><b>🍒 🍒 🍒</b><span>(5 + 5 + 5) ×2 = <strong>+30</strong></span></div><div><b>🍒 ★ 🍒</b><span>(5 + 0 + 5) ×2 = <strong>+20</strong></span></div><div><b>🍋 🍋 🍋</b><span>(8 + 8 + 8) ×2 = <strong>+48</strong></span></div><div><b>🔔 🔔 🍒</b><span>12 + 12 + Bell bonus 16 = <strong>+40</strong></span></div><div><b>🍒 🍋 🔔</b><span>нет пары = <strong>+0</strong></span></div></div><p class="help-text block">Modifiers могут изменить эту математику. Их эффект всегда указан справа в Current Build.</p></section>
+<section class="layout"><div class="machine-panel card"><div class="section-intro"><strong>Slot Grid 3×3</strong><span>После Spin выигрышные клетки подсвечиваются. Ниже появится понятный разбор каждой линии.</span></div><div id="grid" class="grid"></div><button id="spinBtn" class="spin-btn">SPIN</button><div id="resultText" class="result-text">Готов к первому Spin</div><div id="scoreBreakdown" class="score-breakdown"><div class="empty-breakdown">После Spin здесь будет расчёт очков по каждой строке.</div></div></div>
+<aside class="card"><h2>Current Build</h2><p class="muted compact">Символы, которые могут выпасть. ×N — число копий; больше копий повышает шанс выпадения.</p><div id="poolList" class="pool-list"></div><h3>Modifiers</h3><p class="muted compact">Постоянно меняют scoring или поведение машины.</p><div id="modifierList" class="tag-list"></div></aside></section>
+<section id="rewardPanel" class="reward-panel card hidden"></section>
+<section class="layout lower"><div class="card"><h2>Developer Controls</h2><p class="muted">Только для тестирования: вручную меняют билд и позволяют проверить нужную ситуацию.</p><div id="symbolButtons" class="button-grid"></div><hr><div id="modifierButtons" class="button-grid"></div><hr><div class="button-grid"><button id="addCoinsBtn">+20 Coins</button><button id="resetRunBtn">Reset run</button><button id="forceJackpotBtn">Force test grid</button></div><p class="help-text block">Force test grid заставляет следующий Spin показать заранее заданные три выигрышные линии.</p></div><div class="card log-card"><div class="log-title"><div><h2>Technical Event Log</h2><p class="muted compact">Сырой журнал для отладки. Для понимания очков смотри Score Breakdown под автоматом.</p></div><button id="clearLogBtn">Clear</button></div><ol id="eventLog" class="event-log"></ol></div></section>
+</main><script src="app.js"></script></body></html>
