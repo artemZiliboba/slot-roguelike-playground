@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Slot Roguelike — Debug Playground</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div>
+        <h1>Slot Roguelike — Debug Playground</h1>
+        <p>Ранний прототип механики. Без арта, аккаунтов и рейтингов.</p>
+      </div>
+      <div class="seed-box">
+        <label>Seed <input id="seedInput" type="number" value="12345"></label>
+        <button id="restartSeedBtn">Restart same seed</button>
+        <button id="newSeedBtn">New seed</button>
+      </div>
+    </header>
+
+    <section class="hud">
+      <div><span class="label">Target</span><strong id="targetText">0 / 120</strong></div>
+      <div><span class="label">Spins</span><strong id="spinsText">8</strong></div>
+      <div><span class="label">Coins</span><strong id="coinsText">20</strong></div>
+      <div><span class="label">Last spin</span><strong id="lastScoreText">0</strong></div>
+    </section>
+
+    <section class="layout">
+      <div class="machine-panel card">
+        <div id="grid" class="grid" aria-label="slot grid"></div>
+        <button id="spinBtn" class="spin-btn">SPIN</button>
+        <div id="resultText" class="result-text">Готов к первому Spin</div>
+      </div>
+
+      <aside class="card">
+        <h2>Current Build</h2>
+        <div id="poolList" class="pool-list"></div>
+        <h3>Modifiers</h3>
+        <div id="modifierList" class="tag-list"></div>
+      </aside>
+    </section>
+
+    <section class="layout lower">
+      <div class="card">
+        <h2>Developer Controls</h2>
+        <p class="muted">Нужны, чтобы за секунды собирать тестовые билды.</p>
+        <div id="symbolButtons" class="button-grid"></div>
+        <hr>
+        <div id="modifierButtons" class="button-grid"></div>
+        <hr>
+        <div class="button-grid">
+          <button id="addCoinsBtn">+20 Coins</button>
+          <button id="resetRunBtn">Reset run</button>
+          <button id="forceJackpotBtn">Force test grid</button>
+        </div>
+      </div>
+
+      <div class="card log-card">
+        <div class="log-title">
+          <h2>Event Log</h2>
+          <button id="clearLogBtn">Clear</button>
+        </div>
+        <ol id="eventLog" class="event-log"></ol>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
